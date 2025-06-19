@@ -1,6 +1,7 @@
 package com.movierecommender.service;
 
 import com.movierecommender.entity.Recommendation;
+import com.movierecommender.entity.User;
 import com.movierecommender.repository.RecommendationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ public class RecommendationService {
 
     @Autowired
     private RecommendationRepository recommendationRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Value("${ml.service.url}")
     private String mlServiceUrl;
@@ -195,5 +199,50 @@ public class RecommendationService {
     @Transactional(readOnly = true)
     public long getRecommendationCount(Long userId) {
         return recommendationRepository.countByUserId(userId);
+    }
+
+    public void regenerateAllUserRecommendations() {
+        logger.info("Starting regeneration of recommendations for all users");
+        
+        try {
+            List<User> activeUsers = userService.getActiveUsersWithLetterboxd();
+            logger.info("Found {} active users with Letterboxd profiles", activeUsers.size());
+            
+            for (User user : activeUsers) {
+                try {
+                    generateRecommendationsForUser(user.getId());
+                    logger.debug("Successfully regenerated recommendations for user: {}", user.getId());
+                } catch (Exception e) {
+                    logger.error("Failed to regenerate recommendations for user {}: {}", 
+                            user.getId(), e.getMessage());
+                    // Continue with other users even if one fails
+                }
+            }
+            
+            logger.info("Completed regeneration of recommendations for all users");
+        } catch (Exception e) {
+            logger.error("Error during bulk recommendation regeneration: {}", e.getMessage());
+            throw new RuntimeException("Failed to regenerate recommendations for all users: " + e.getMessage());
+        }
+    }    public BigDecimal getRecommendationAccuracy() {
+        // This is a placeholder implementation
+        // In a real scenario, you would calculate actual accuracy metrics
+        // based on user feedback, ratings, clicks, etc.
+        try {
+            long totalRecommendations = recommendationRepository.count();
+            
+            if (totalRecommendations == 0) {
+                return BigDecimal.ZERO;
+            }
+            
+            // Simple accuracy metric - placeholder calculation
+            // In reality, you'd calculate based on user interactions, feedback, etc.
+            BigDecimal accuracy = BigDecimal.valueOf(75.5); // Placeholder value
+            
+            return accuracy;
+        } catch (Exception e) {
+            logger.error("Error calculating recommendation accuracy: {}", e.getMessage());
+            return BigDecimal.ZERO;
+        }
     }
 }

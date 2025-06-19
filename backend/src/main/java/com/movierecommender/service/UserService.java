@@ -4,6 +4,8 @@ import com.movierecommender.entity.User;
 import com.movierecommender.repository.UserRepository;
 import com.movierecommender.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -108,6 +110,22 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public long getActiveUserCount() {
         return userRepository.countActiveUsers();
+    }
+
+    @Transactional(readOnly = true)
+    public long getTotalUserCount() {
+        return userRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    public User activateUser(Long userId) {
+        User user = getUserById(userId);
+        user.setIsActive(true);
+        return userRepository.save(user);
     }
 
     public User deactivateUser(Long userId) {

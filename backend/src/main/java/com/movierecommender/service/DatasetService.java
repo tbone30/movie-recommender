@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -105,6 +106,17 @@ public class DatasetService {
     @Transactional(readOnly = true)
     public Optional<DatasetMetrics> getLatestMetrics() {
         return datasetMetricsRepository.findLatest();
+    }
+
+    @Transactional
+    public DatasetMetrics getDatasetMetrics() {
+        Optional<DatasetMetrics> latestMetrics = getLatestMetrics();
+        if (latestMetrics.isPresent()) {
+            return latestMetrics.get();
+        } else {
+            // If no metrics exist, calculate and save new ones
+            return calculateAndSaveDatasetMetrics();
+        }
     }
 
     @Transactional(readOnly = true)
@@ -225,5 +237,247 @@ public class DatasetService {
         // This is a simplified check - in production you might want more sophisticated logic
         LocalDateTime lastTraining = metrics.getLastTrainingCompleted();
         return lastTraining.isBefore(LocalDateTime.now().minusDays(7)) && isReadyForTraining();
+    }
+
+    public void rebuildDataset() {
+        logger.info("Initiating dataset rebuild");
+        
+        try {
+            // Calculate and save new dataset metrics
+            DatasetMetrics newMetrics = calculateAndSaveDatasetMetrics();
+            logger.info("Dataset metrics recalculated: {} users, {} movies, {} ratings", 
+                    newMetrics.getTotalUsers(), newMetrics.getTotalMovies(), newMetrics.getTotalRatings());
+            
+            // If the dataset is ready for training, trigger a rebuild in the ML service
+            if (isReadyForTraining()) {
+                String url = String.format("%s/dataset/rebuild", mlServiceUrl);
+                
+                Map<String, Object> response = webClient.post()
+                        .uri(url)
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .timeout(Duration.ofMillis(timeout * 2)) // Extended timeout for rebuild
+                        .block();
+                
+                logger.info("Dataset rebuild completed successfully: {}", response);
+            } else {
+                logger.warn("Dataset not ready for training. Rebuild skipped.");
+            }
+            
+        } catch (WebClientResponseException e) {
+            logger.error("ML service error during dataset rebuild: {} - {}", 
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to rebuild dataset: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error during dataset rebuild: {}", e.getMessage());
+            throw new RuntimeException("Failed to rebuild dataset: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> getMLServiceStatus() {
+        try {
+            String url = String.format("%s/status", mlServiceUrl);
+            
+            logger.info("Getting ML service status");
+            
+            Map<String, Object> response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .timeout(Duration.ofSeconds(10))
+                    .block();
+            
+            if (response != null) {
+                logger.info("ML service status retrieved successfully");
+                return response;
+            } else {
+                return Map.of("status", "unavailable", "message", "No response from ML service");
+            }
+            
+        } catch (WebClientResponseException e) {
+            logger.error("ML service error getting status: {} - {}", 
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            return Map.of(
+                "status", "error",
+                "message", "ML service returned error: " + e.getStatusCode(),
+                "error", e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            logger.error("Error getting ML service status: {}", e.getMessage());
+            return Map.of(
+                "status", "unavailable",
+                "message", "Failed to connect to ML service",
+                "error", e.getMessage()
+            );
+        }
+    }
+
+    public Map<String, Object> getDatasetHealth() {
+        try {
+            logger.info("Calculating dataset health metrics");
+            
+            // Get current dataset metrics
+            Optional<DatasetMetrics> metricsOpt = getLatestMetrics();
+            if (metricsOpt.isEmpty()) {
+                return Map.of(
+                    "status", "unhealthy",
+                    "message", "No dataset metrics available",
+                    "score", 0
+                );
+            }
+            
+            DatasetMetrics metrics = metricsOpt.get();
+            
+            // Calculate health score based on various factors
+            int healthScore = 100;
+            String status = "healthy";
+            String message = "Dataset is in good health";
+            
+            // Check if dataset meets minimum requirements
+            if (metrics.getTotalUsers() < minUsersForTraining) {
+                healthScore -= 30;
+                status = "warning";
+                message = "Insufficient users for training";
+            }
+            
+            if (metrics.getTotalRatings() < minRatingsForTraining) {
+                healthScore -= 30;
+                status = "warning";
+                message = "Insufficient ratings for training";
+            }
+            
+            // Check sparsity - if too sparse, reduce health score
+            if (metrics.getSparsity().compareTo(BigDecimal.valueOf(0.001)) < 0) {
+                healthScore -= 20;
+                if (status.equals("healthy")) {
+                    status = "warning";
+                    message = "Dataset is very sparse";
+                }
+            }
+            
+            // Check training status
+            if (metrics.getTrainingStatus() == DatasetMetrics.TrainingStatus.FAILED) {
+                healthScore -= 40;
+                status = "unhealthy";
+                message = "Last training failed";
+            }
+            
+            // Determine final status based on score
+            if (healthScore < 50) {
+                status = "unhealthy";
+            } else if (healthScore < 80) {
+                status = "warning";
+            }
+            
+            return Map.of(
+                "status", status,
+                "score", Math.max(0, healthScore),
+                "message", message,
+                "details", Map.of(
+                    "total_users", metrics.getTotalUsers(),
+                    "total_ratings", metrics.getTotalRatings(),
+                    "total_movies", metrics.getTotalMovies(),
+                    "sparsity", metrics.getSparsity(),
+                    "training_status", metrics.getTrainingStatus() != null ? 
+                        metrics.getTrainingStatus().toString() : "UNKNOWN",
+                    "last_updated", metrics.getCreatedAt()
+                )
+            );
+            
+        } catch (Exception e) {
+            logger.error("Error calculating dataset health: {}", e.getMessage());
+            return Map.of(
+                "status", "error",
+                "message", "Failed to calculate dataset health",
+                "score", 0,
+                "error", e.getMessage()
+            );
+        }
+    }    public void performSystemCleanup() {
+        logger.info("Starting system cleanup");
+        
+        try {
+            // Recalculate dataset metrics to ensure they're up to date
+            DatasetMetrics newMetrics = calculateAndSaveDatasetMetrics();
+            logger.info("Dataset metrics recalculated and saved");
+            
+            // Clean up old recommendations if we have a current model version
+            if (newMetrics.getModelVersion() != null) {
+                // This would typically call RecommendationService to clean old recommendations
+                logger.info("Current model version: {}", newMetrics.getModelVersion());
+            }
+            
+            // Trigger ML service cleanup if available
+            try {
+                String url = String.format("%s/cleanup", mlServiceUrl);
+                
+                Map<String, Object> response = webClient.post()
+                        .uri(url)
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .timeout(Duration.ofSeconds(30))
+                        .block();
+                
+                if (response != null) {
+                    logger.info("ML service cleanup completed: {}", response);
+                }
+            } catch (Exception e) {
+                logger.warn("ML service cleanup failed (non-critical): {}", e.getMessage());
+            }
+            
+            logger.info("System cleanup completed successfully");
+            
+        } catch (Exception e) {
+            logger.error("Error during system cleanup: {}", e.getMessage());
+            throw new RuntimeException("System cleanup failed: " + e.getMessage());
+        }
+    }
+
+    public void triggerBulkDataCollection(List<String> usernames) {
+        logger.info("Starting bulk data collection for {} usernames", usernames.size());
+        
+        try {
+            // Call ML service to trigger bulk data collection
+            String url = String.format("%s/data/collect/bulk", mlServiceUrl);
+            
+            Map<String, Object> requestBody = Map.of(
+                "usernames", usernames,
+                "timestamp", LocalDateTime.now().toString()
+            );
+            
+            Map<String, Object> response = webClient.post()
+                    .uri(url)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .timeout(Duration.ofMillis(timeout * 3)) // Extended timeout for bulk operations
+                    .block();
+            
+            if (response != null) {
+                logger.info("Bulk data collection initiated successfully: {}", response);
+                
+                // If the response contains information about successful collections, log it
+                if (response.get("processed_count") != null) {
+                    logger.info("Successfully processed {} usernames for data collection", 
+                            response.get("processed_count"));
+                }
+                
+                if (response.get("failed_count") != null && 
+                    ((Number) response.get("failed_count")).intValue() > 0) {
+                    logger.warn("Failed to process {} usernames for data collection", 
+                            response.get("failed_count"));
+                }
+            } else {
+                logger.warn("No response received from ML service for bulk data collection");
+            }
+            
+        } catch (WebClientResponseException e) {
+            logger.error("ML service error during bulk data collection: {} - {}", 
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to trigger bulk data collection: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error during bulk data collection: {}", e.getMessage());
+            throw new RuntimeException("Failed to trigger bulk data collection: " + e.getMessage());
+        }
     }
 }
