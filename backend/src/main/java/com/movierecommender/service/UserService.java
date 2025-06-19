@@ -1,8 +1,11 @@
 package com.movierecommender.service;
 
+import com.movierecommender.entity.Rating;
 import com.movierecommender.entity.User;
 import com.movierecommender.repository.UserRepository;
 import com.movierecommender.security.UserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class UserService implements UserDetailsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -132,5 +138,46 @@ public class UserService implements UserDetailsService {
         User user = getUserById(userId);
         user.setIsActive(false);
         return userRepository.save(user);
+    }
+
+    public void syncUserWithLetterboxd(Long userId, String letterboxdUsername) {
+        User user = getUserById(userId);
+        user.setLetterboxdUsername(letterboxdUsername);
+        user.setSyncStatus(User.SyncStatus.PENDING);
+        userRepository.save(user);
+        logger.info("User {} sync with Letterboxd initiated for username: {}", userId, letterboxdUsername);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Rating> getUserRatings(Long userId, Pageable pageable) {
+        // This would typically come from a RatingRepository
+        // For now, return empty page since RatingService doesn't exist
+        return Page.empty(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getUserStatistics(Long userId) {
+        User user = getUserById(userId);
+        
+        // Calculate basic statistics
+        Map<String, Object> stats = Map.of(
+            "user_id", userId,
+            "username", user.getUsername(),
+            "join_date", user.getCreatedAt(),
+            "sync_status", user.getSyncStatus(),
+            "last_sync_date", user.getLastSyncDate(),
+            "total_ratings", 0, // Would come from RatingRepository
+            "average_rating", 0.0, // Would come from RatingRepository
+            "letterboxd_username", user.getLetterboxdUsername()
+        );
+        
+        return stats;
+    }
+
+    public void deleteUser(Long userId) {
+        User user = getUserById(userId);
+        user.setIsActive(false);
+        userRepository.save(user);
+        logger.info("User {} marked as inactive (soft delete)", userId);
     }
 }
