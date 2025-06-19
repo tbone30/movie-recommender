@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Provider } from 'react-redux';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { store } from './store';
+import store from './store';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
