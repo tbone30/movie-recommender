@@ -124,7 +124,7 @@ const movieSlice = createSlice({
       })
       // Fetch popular movies
       .addCase(fetchPopularMovies.fulfilled, (state, action) => {
-        state.popularMovies = action.payload;
+        state.popularMovies = action.payload.content;
       })
       // Search movies
       .addCase(searchMovies.pending, (state) => {
@@ -132,7 +132,7 @@ const movieSlice = createSlice({
       })
       .addCase(searchMovies.fulfilled, (state, action) => {
         state.searchLoading = false;
-        state.searchResults = action.payload;
+        state.searchResults = action.payload.content;
       })
       .addCase(searchMovies.rejected, (state) => {
         state.searchLoading = false;

@@ -19,12 +19,14 @@ const moviePersistConfig = {
   whitelist: ['genres', 'popularMovies'],
 };
 
+const rootReducer = {
+  auth: persistReducer(authPersistConfig, authReducer),
+  movies: persistReducer(moviePersistConfig, movieReducer),
+  recommendations: recommendationReducer,
+};
+
 const store = configureStore({
-  reducer: {
-    auth: persistReducer(authPersistConfig, authReducer),
-    movies: persistReducer(moviePersistConfig, movieReducer),
-    recommendations: recommendationReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
