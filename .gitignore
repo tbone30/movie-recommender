@@ -51,6 +51,7 @@ python-ml-service/.env
 *.swp
 *.swo
 *~
+instructions.txt
 
 # OS files
 .DS_Store
