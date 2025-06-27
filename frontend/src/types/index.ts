@@ -26,31 +26,44 @@ export interface LetterboxdProfile {
   username: string;
   displayName?: string;
   bio?: string;
-  profileImageUrl?: string;
-  totalFilms?: number;
-  totalRatings?: number;
-  totalWatchlistItems?: number;
+  location?: string;
+  website?: string;
+  joinedDate?: string;
+  filmsWatched?: number;
+  followers?: number;
+  following?: number;
 }
 
-export interface LetterboxdMovie {
-  title: string;
-  year?: number;
-  director?: string;
+export interface LetterboxdRating {
+  filmTitle: string;
+  filmYear?: number;
+  filmSlug?: string;
   rating?: number;
-  letterboxdUrl?: string;
-  tmdbId?: string;
-  imdbId?: string;
+  watchedDate?: string;
+  review?: string;
+  letterboxdUri?: string;
+}
+
+export interface LetterboxdWatchlistFilm {
+  filmTitle: string;
+  filmYear?: number;
+  filmSlug?: string;
+  directors?: string[];
+  genres?: string[];
+  addedDate?: string;
+  letterboxdUri?: string;
 }
 
 export interface LetterboxdScrapeResponse {
-  success: boolean;
-  errorMessage?: string;
+  username: string;
   profile?: LetterboxdProfile;
-  ratings?: LetterboxdMovie[];
-  watchlist?: LetterboxdMovie[];
+  ratings?: LetterboxdRating[];
+  watchlist?: LetterboxdWatchlistFilm[];
+  scrapedAt?: string;
   totalRatings: number;
   totalWatchlistItems: number;
-  processingTime?: number;
+  success: boolean;
+  errorMessage?: string;
 }
 
 export interface ScrapeOptions {

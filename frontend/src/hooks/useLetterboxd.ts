@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import letterboxdApi, { 
+import letterboxdApi from '../services/letterboxdApi';
+import { 
   LetterboxdScrapeResponse, 
   LetterboxdProfile, 
   ScrapeOptions 
-} from '../services/letterboxdApi';
+} from '../types';
 
 interface UseLetterboxdState {
   isLoading: boolean;

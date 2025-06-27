@@ -325,6 +325,19 @@
   font-size: 0.9rem;
 }
 
+.movie-item .watched-date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+.movie-item .directors,
+.movie-item .genres {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
 .more-items {
   padding: 8px 12px;
   background: #e3f2fd;

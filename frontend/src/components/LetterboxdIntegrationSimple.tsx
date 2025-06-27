@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLetterboxd } from '../hooks/useLetterboxd';
-import { ScrapeOptions } from '../services/letterboxdApi';
+import { ScrapeOptions, LetterboxdRating, LetterboxdWatchlistFilm } from '../types';
 import './LetterboxdIntegration.css';
 
 interface LetterboxdIntegrationSimpleProps {
@@ -143,19 +143,39 @@ const LetterboxdIntegrationSimple: React.FC<LetterboxdIntegrationSimpleProps> = 
                 <strong>Display Name:</strong> {profile.displayName}
               </div>
             )}
-            {profile.totalFilms !== undefined && (
+            {profile.filmsWatched !== undefined && (
               <div className="profile-item">
-                <strong>Total Films:</strong> {profile.totalFilms}
+                <strong>Films Watched:</strong> {profile.filmsWatched}
               </div>
             )}
-            {profile.totalRatings !== undefined && (
+            {profile.followers !== undefined && (
               <div className="profile-item">
-                <strong>Total Ratings:</strong> {profile.totalRatings}
+                <strong>Followers:</strong> {profile.followers}
               </div>
             )}
-            {profile.totalWatchlistItems !== undefined && (
+            {profile.following !== undefined && (
               <div className="profile-item">
-                <strong>Watchlist Items:</strong> {profile.totalWatchlistItems}
+                <strong>Following:</strong> {profile.following}
+              </div>
+            )}
+            {profile.bio && (
+              <div className="profile-item">
+                <strong>Bio:</strong> {profile.bio}
+              </div>
+            )}
+            {profile.location && (
+              <div className="profile-item">
+                <strong>Location:</strong> {profile.location}
+              </div>
+            )}
+            {profile.website && (
+              <div className="profile-item">
+                <strong>Website:</strong> {profile.website}
+              </div>
+            )}
+            {profile.joinedDate && (
+              <div className="profile-item">
+                <strong>Joined:</strong> {profile.joinedDate}
               </div>
             )}
           </div>
@@ -232,14 +252,14 @@ const LetterboxdIntegrationSimple: React.FC<LetterboxdIntegrationSimpleProps> = 
               <div className="result-item">
                 ✅ <strong>Success!</strong>
               </div>              <div className="result-item">
-                <strong>Ratings scraped:</strong> {scrapeResult.total_ratings}
+                <strong>Ratings scraped:</strong> {scrapeResult.totalRatings}
               </div>
               <div className="result-item">
-                <strong>Watchlist items:</strong> {scrapeResult.total_watchlist_items}
+                <strong>Watchlist items:</strong> {scrapeResult.totalWatchlistItems}
               </div>
-              {scrapeResult.processing_time && (
+              {scrapeResult.scrapedAt && (
                 <div className="result-item">
-                  <strong>Processing time:</strong> {scrapeResult.processing_time}ms
+                  <strong>Scraped at:</strong> {new Date(scrapeResult.scrapedAt).toLocaleString()}
                 </div>
               )}
               
@@ -247,10 +267,11 @@ const LetterboxdIntegrationSimple: React.FC<LetterboxdIntegrationSimpleProps> = 
                 <div className="data-preview">
                   <h4>Sample Ratings ({scrapeResult.ratings.length} total):</h4>
                   <div className="movie-list">
-                    {scrapeResult.ratings.slice(0, 5).map((movie, index) => (
+                    {scrapeResult.ratings.slice(0, 5).map((rating: LetterboxdRating, index: number) => (
                       <div key={index} className="movie-item">
-                        <strong>{movie.title}</strong> {movie.year && `(${movie.year})`}
-                        {movie.rating && ` - ⭐ ${movie.rating}/5`}
+                        <strong>{rating.filmTitle}</strong> {rating.filmYear && `(${rating.filmYear})`}
+                        {rating.rating && ` - ⭐ ${rating.rating}/5`}
+                        {rating.watchedDate && <div className="watched-date">Watched: {rating.watchedDate}</div>}
                       </div>
                     ))}
                     {scrapeResult.ratings.length > 5 && (
@@ -266,9 +287,15 @@ const LetterboxdIntegrationSimple: React.FC<LetterboxdIntegrationSimpleProps> = 
                 <div className="data-preview">
                   <h4>Sample Watchlist ({scrapeResult.watchlist.length} total):</h4>
                   <div className="movie-list">
-                    {scrapeResult.watchlist.slice(0, 5).map((movie, index) => (
+                    {scrapeResult.watchlist.slice(0, 5).map((film: LetterboxdWatchlistFilm, index: number) => (
                       <div key={index} className="movie-item">
-                        <strong>{movie.title}</strong> {movie.year && `(${movie.year})`}
+                        <strong>{film.filmTitle}</strong> {film.filmYear && `(${film.filmYear})`}
+                        {film.directors && film.directors.length > 0 && (
+                          <div className="directors">Director(s): {film.directors.join(', ')}</div>
+                        )}
+                        {film.genres && film.genres.length > 0 && (
+                          <div className="genres">Genre(s): {film.genres.join(', ')}</div>
+                        )}
                       </div>
                     ))}
                     {scrapeResult.watchlist.length > 5 && (
@@ -281,7 +308,7 @@ const LetterboxdIntegrationSimple: React.FC<LetterboxdIntegrationSimpleProps> = 
               )}
             </div>
           ) : (            <div className="results-error">
-              ❌ <strong>Scraping failed:</strong> {scrapeResult.error_message}
+              ❌ <strong>Scraping failed:</strong> {scrapeResult.errorMessage}
             </div>
           )}
 

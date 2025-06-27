@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LetterboxdIntegrationSimple from '../components/LetterboxdIntegrationSimple';
-import { LetterboxdScrapeResponse } from '../services/letterboxdApi';
+import { LetterboxdScrapeResponse } from '../types';
 
 const LetterboxdPage: React.FC = () => {
   const [scrapedData, setScrapedData] = useState<LetterboxdScrapeResponse | null>(null);
