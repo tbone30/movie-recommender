@@ -2,7 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import MoviesPage from './pages/MoviesPage';
 import UsersPage from './pages/UsersPage';
+import LetterboxdPage from './pages/LetterboxdPage';
 import './App.css';
+import './pages/LetterboxdPage.css';
 
 const App: React.FC = () => {
   return (
@@ -12,20 +14,20 @@ const App: React.FC = () => {
           <div className="container">
             <Link to="/" className="logo">
               🎬 Movie Recommender
-            </Link>
-            <nav className="nav">
+            </Link>            <nav className="nav">
               <Link to="/movies" className="nav-link">Movies</Link>
               <Link to="/users" className="nav-link">Users</Link>
+              <Link to="/letterboxd" className="nav-link">Letterboxd</Link>
             </nav>
           </div>
         </header>
 
         <main className="main-content">
-          <div className="container">
-            <Routes>
+          <div className="container">            <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/movies" element={<MoviesPage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/letterboxd" element={<LetterboxdPage />} />
             </Routes>
           </div>
         </main>
@@ -45,6 +47,9 @@ const HomePage: React.FC = () => {
         </Link>
         <Link to="/users" className="btn btn-secondary">
           View Users
+        </Link>
+        <Link to="/letterboxd" className="btn btn-accent">
+          Import from Letterboxd
         </Link>
       </div>
     </div>
