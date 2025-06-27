@@ -1,0 +1,109 @@
+SPRING BOOT BACKEND SETUP GUIDE
+================================
+
+2. DEPENDENCIES IN POM.XML
+   Current dependencies are sufficient for basic web application:
+   - spring-boot-starter-web: For REST APIs and web functionality
+   - spring-boot-starter-test: For unit and integration testing
+   - spring-boot-devtools: For development convenience (hot reload)
+   
+   Optional additions for advanced features:
+   - spring-boot-starter-data-jpa: For database operations
+   - Database drivers: H2 (testing), MySQL, PostgreSQL (production)
+   - spring-boot-starter-security: For authentication/authorization
+   - spring-boot-starter-validation: For input validation
+
+3. CREATE BACKEND COMPONENTS
+
+   A. MODEL LAYER (Data Objects)
+      - Create POJOs (Plain Old Java Objects) for your data
+      - Examples: Product.java, User.java, Order.java
+      - Include: constructors, getters, setters, toString()
+      - Location: com.example.store.model package
+
+   B. SERVICE LAYER (Business Logic)
+      - Create service classes with @Service annotation
+      - Handle business logic and data processing
+      - Examples: ProductService.java, UserService.java
+      - Location: com.example.store.service package
+
+   C. CONTROLLER LAYER (API Endpoints)
+      - Create REST controllers with @RestController annotation
+      - Define API endpoints for CRUD operations
+      - Examples: ProductController.java, UserController.java
+      - Location: com.example.store.controller package
+
+4. COMMON SPRING BOOT ANNOTATIONS
+   - @SpringBootApplication: Main application class
+   - @RestController: REST API controllers
+   - @Service: Business logic services
+   - @Repository: Data access layer (if using JPA)
+   - @Entity: JPA entities (if using database)
+   - @RequestMapping: Base URL mapping
+   - @GetMapping: HTTP GET requests
+   - @PostMapping: HTTP POST requests
+   - @PutMapping: HTTP PUT requests
+   - @DeleteMapping: HTTP DELETE requests
+   - @PathVariable: URL path parameters
+   - @RequestBody: Request payload binding
+   - @RequestParam: Query parameters
+
+5. TYPICAL REST API ENDPOINTS
+   GET    /api/products          - Get all products
+   GET    /api/products/{id}     - Get product by ID
+   POST   /api/products          - Create new product
+   PUT    /api/products/{id}     - Update existing product
+   DELETE /api/products/{id}     - Delete product
+
+6. DATABASE INTEGRATION (OPTIONAL)
+   - Add JPA dependency to pom.xml
+   - Configure database connection in application.properties
+   - Create repository interfaces extending JpaRepository
+   - Add @Entity annotations to model classes
+   - Add @Id and @GeneratedValue for primary keys
+
+7. CONFIGURATION FILES
+   - application.properties: Main configuration file
+   - Configure server port, database connections, logging levels
+   - Example: server.port=8080, spring.datasource.url=...
+
+8. RUNNING THE APPLICATION
+   Options to run:
+   - Command line: mvn spring-boot:run
+   - IDE: Run main method in StoreApplication.java
+   - Executable JAR: mvn package, then java -jar target/store-0.0.1-SNAPSHOT.jar
+   
+   Default URL: http://localhost:8080
+
+9. TESTING YOUR APIs
+   Tools for testing:
+   - Postman: GUI tool for API testing
+   - curl: Command line HTTP client
+   - Browser: For GET requests
+   - Swagger UI: API documentation and testing (with springdoc dependency)
+
+10. BEST PRACTICES
+    - Use proper HTTP status codes (200, 201, 404, 500, etc.)
+    - Implement proper error handling with @ExceptionHandler
+    - Use DTOs (Data Transfer Objects) for API requests/responses
+    - Add input validation with @Valid and validation annotations
+    - Implement logging with SLF4J
+    - Write unit tests for services and integration tests for controllers
+    - Use profiles for different environments (dev, test, prod)
+
+NEXT STEPS FOR YOUR PROJECT
+---------------------------
+1. Create a REST controller to replace the current HomeController
+2. Define your data models (Product, User, etc.)
+3. Implement service classes for business logic
+4. Add database support if needed
+5. Test your APIs with Postman or similar tools
+6. Add proper error handling and validation
+7. Write tests for your components
+
+HELPFUL RESOURCES
+-----------------
+- Spring Boot Official Documentation: https://spring.io/projects/spring-boot
+- Spring Boot Guides: https://spring.io/guides
+- Baeldung Spring Boot Tutorials: https://www.baeldung.com/spring-boot
+- Spring Boot Reference Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/

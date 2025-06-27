@@ -12,6 +12,7 @@ public class Movie {
     private String title;
     
     private String genre;
+
     private String director;
     
     @Column(name = "release_year")
@@ -32,6 +33,10 @@ public class Movie {
         this.releaseYear = releaseYear;
         this.rating = rating;
         this.description = description;
+    }
+
+    public Movie(String title) {
+        this.title = title;
     }
 
     public Long getId() {

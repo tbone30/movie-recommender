@@ -1,9 +1,19 @@
-# Node.js dependencies
-frontend/node_modules/
+# Dependencies
+# Node.js
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
 # Build outputs
 frontend/build/
 frontend/dist/
+backend/target/
+build/
+dist/
+out/
 
 # Environment variables
 .env
@@ -11,39 +21,113 @@ frontend/dist/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.development
+.env.test
+.env.production
 
 # Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 *.log
-
-# Runtime data
+logs/
 pids
 *.pid
 *.seed
 *.pid.lock
 
+# Runtime data
+lib-cov
+coverage/
+.nyc_output
+.grunt
+bower_components
+.lock-wscript
+
 # Java
-backend/target/
 *.class
 *.jar
 *.war
 *.ear
 *.nar
 hs_err_pid*
+replay_pid*
 
 # Maven
-backend/.mvn/timing.properties
-backend/.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 # Python
-python-ml-service/__pycache__/
-python-ml-service/*.py[cod]
-python-ml-service/*$py.class
-python-ml-service/.pytest_cache/
-python-ml-service/venv/
-python-ml-service/.env
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.virtualenv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+db/
+data/
+database/
+**/*.db
+**/*.sqlite
+**/*.sqlite3
 
 # IDE files
 .vscode/
@@ -51,8 +135,107 @@ python-ml-service/.env
 *.swp
 *.swo
 *~
-instructions.txt
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache
+.apt_generated
+.factorypath
+
+# JetBrains IDEs
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Thumbs.db:encryptable
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Project specific files
+instructions.txt
+RUNNING_INSTRUCTIONS.md
+LETTERBOXD_SETUP.md
+
+# Compiled files
+*.com
+*.exe
+*.o
+*.so
+
+# Packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Application data
+application-*.yml
+application-*.properties
+!application.properties
+!application.yml

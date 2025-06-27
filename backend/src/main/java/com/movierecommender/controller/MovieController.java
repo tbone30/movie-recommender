@@ -2,6 +2,12 @@ package com.movierecommender.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.movierecommender.entity.Movie;
 import com.movierecommender.service.MovieService;
@@ -15,27 +21,31 @@ public class MovieController {
 
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
-    }
-
-    @RequestMapping("/getAll")
+    }    
+    
+    @GetMapping("/getAll")
     public List<Movie> getAllMovies() {
         return movieService.getAllMovies();
     }
     
-    public Movie getMovieById(Long id) {
+    @GetMapping("/{id}")
+    public Movie getMovieById(@PathVariable Long id) {
         return movieService.getMovieById(id)
                 .orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
     }
 
-    public Movie createMovie(Movie movie) {
+    @PostMapping
+    public Movie createMovie(@RequestBody Movie movie) {
         return movieService.createMovie(movie);
     }
 
-    public Movie updateMovie(Long id, Movie movieDetails) {
+    @PutMapping("/{id}")
+    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
         return movieService.updateMovie(id, movieDetails);
     }
 
-    public void deleteMovie(Long id) {
+    @DeleteMapping("/{id}")
+    public void deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
     }
 }

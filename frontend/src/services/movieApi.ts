@@ -4,7 +4,7 @@ import { Movie } from '../types';
 export const movieApi = {
   // Get all movies
   getAllMovies: async (): Promise<Movie[]> => {
-    const response = await api.get('/movies');
+    const response = await api.get('/movies/getAll');
     return response.data;
   },
 
