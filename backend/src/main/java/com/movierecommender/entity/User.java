@@ -1,23 +1,36 @@
 package com.movierecommender.entity;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "users")
 public class User {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
     private String username;
+    
+    @Column(unique = true, nullable = false)
     private String email;
-    private String letterBoxdUsername;
+    
+    @Column(name = "letterboxd_username")
+    private String letterboxdUsername;
 
-    public User(int id, String username, String email, String letterBoxdUsername) {
-        this.id = id;
+    // Default constructor
+    public User() {}
+
+    public User(String username, String email, String letterboxdUsername) {
         this.username = username;
         this.email = email;
-        this.letterBoxdUsername = letterBoxdUsername;
+        this.letterboxdUsername = letterboxdUsername;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -37,11 +50,21 @@ public class User {
         this.email = email;
     }
 
-    public String getLetterBoxdUsername() {
-        return letterBoxdUsername;
+    public String getLetterboxdUsername() {
+        return letterboxdUsername;
     }
 
-    public void setLetterBoxdUsername(String letterBoxdUsername) {
-        this.letterBoxdUsername = letterBoxdUsername;
+    public void setLetterboxdUsername(String letterboxdUsername) {
+        this.letterboxdUsername = letterboxdUsername;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", letterboxdUsername='" + letterboxdUsername + '\'' +
+                '}';
     }
 }

@@ -1,16 +1,31 @@
 package com.movierecommender.entity;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "movies")
 public class Movie {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
     private String title;
+    
     private String genre;
     private String director;
-    private int releaseYear;
-    private double rating;
+    
+    @Column(name = "release_year")
+    private Integer releaseYear;
+    
+    private Double rating;
+    
+    @Column(length = 1000)
     private String description;
 
-    public Movie(int id, String title, String genre, String director, int releaseYear, double rating, String description) {
-        this.id = id;
+    // Default constructor
+    public Movie() {}
+
+    public Movie(String title, String genre, String director, Integer releaseYear, Double rating, String description) {
         this.title = title;
         this.genre = genre;
         this.director = director;
@@ -19,11 +34,11 @@ public class Movie {
         this.description = description;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,19 +66,19 @@ public class Movie {
         this.director = director;
     }
 
-    public int getReleaseYear() {
+    public Integer getReleaseYear() {
         return releaseYear;
     }
 
-    public void setReleaseYear(int releaseYear) {
+    public void setReleaseYear(Integer releaseYear) {
         this.releaseYear = releaseYear;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
@@ -73,5 +88,18 @@ public class Movie {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", genre='" + genre + '\'' +
+                ", director='" + director + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", rating=" + rating +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
