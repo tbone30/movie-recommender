@@ -2,27 +2,20 @@
 echo Starting Letterboxd Scraper Service...
 echo.
 
+REM Set Python executable path
+set PYTHON_EXE=C:/Users/twelc/AppData/Local/Programs/Python/Python313/python.exe
+
 REM Check if Python is installed
-python --version >nul 2>&1
+%PYTHON_EXE% --version >nul 2>&1
 if errorlevel 1 (
-    echo Python is not installed or not in PATH
+    echo Python is not installed or not accessible at %PYTHON_EXE%
     pause
     exit /b 1
 )
 
-REM Create virtual environment if it doesn't exist
-if not exist venv (
-    echo Creating virtual environment...
-    python -m venv venv
-)
-
-REM Activate virtual environment
-echo Activating virtual environment...
-call venv\Scripts\activate.bat
-
-REM Install dependencies
-echo Installing dependencies...
-pip install -r requirements.txt
+REM Install dependencies if needed
+echo Checking and installing dependencies...
+%PYTHON_EXE% -m pip install fastapi uvicorn requests python-dotenv aiohttp python-multipart beautifulsoup4 selenium pydantic
 
 REM Start the service
 echo.
@@ -31,6 +24,6 @@ echo Service will be available at: http://localhost:5000
 echo API Documentation: http://localhost:5000/docs
 echo.
 
-python app.py
+%PYTHON_EXE% app.py
 
 pause

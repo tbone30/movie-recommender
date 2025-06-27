@@ -40,8 +40,7 @@ class LetterboxdClient:
                     
                     html = await response.text()
                     soup = BeautifulSoup(html, 'html.parser')
-                    
-                    # Extract basic profile info
+                      # Extract basic profile info
                     display_name = username
                     bio = None
                     location = None
@@ -50,6 +49,14 @@ class LetterboxdClient:
                     films_watched = 0
                     followers = 0
                     following = 0
+                    profile_image_url = None
+                    
+                    # Try to extract profile image
+                    avatar_elem = soup.find('span', class_='avatar')
+                    if avatar_elem:
+                        img_elem = avatar_elem.find('img')
+                        if img_elem and img_elem.get('src'):
+                            profile_image_url = img_elem.get('src')
                     
                     # Try to extract display name
                     display_name_elem = soup.find('h1', class_='title-1')
@@ -74,18 +81,13 @@ class LetterboxdClient:
                                     try:
                                         films_watched = int(stat_value)
                                     except ValueError:
-                                        pass
-                                elif 'followers' in href:
-                                    try:
-                                        followers = int(stat_value)
-                                    except ValueError:
-                                        pass
+                                        pass                                
                                 elif 'following' in href:
                                     try:
                                         following = int(stat_value)
                                     except ValueError:
                                         pass
-                    
+                
                     profile_data = {
                         'username': username,
                         'display_name': display_name,
@@ -95,7 +97,8 @@ class LetterboxdClient:
                         'joined_date': joined_date,
                         'films_watched': films_watched,
                         'followers': followers,
-                        'following': following
+                        'following': following,
+                        'profile_image_url': profile_image_url
                     }
                     
                     self.logger.info(f"Successfully fetched profile for user: {username}")

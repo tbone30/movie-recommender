@@ -21,7 +21,7 @@ source venv/bin/activate
 
 # Install dependencies
 echo "Installing dependencies..."
-pip install -r requirements.txt
+pip install fastapi uvicorn requests python-dotenv aiohttp python-multipart beautifulsoup4 selenium pydantic
 
 # Start the service
 echo
