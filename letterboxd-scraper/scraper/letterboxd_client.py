@@ -18,7 +18,7 @@ class LetterboxdClient:
     
     def get_user_films_rated(self, username: str):
         user_instance = user.User(username)
-        films = user_instance.user_films_rated()
+        films = user.user_films_rated(user_instance)
         return films
     
     def get_user_watchlist(self, username: str):
@@ -28,35 +28,30 @@ class LetterboxdClient:
     
     def get_user_genre_info(self, username: str):
         user_instance = user.User(username)
-        genre_info = user_instance.user_genre_info()
+        genre_info = user.user_genre_info(user_instance)
         return genre_info
 
     def get_movie(self, slug: str):
         movie_instance = movie.Movie(slug)
         return movie_instance
     
-    def get_movie_popular_reviews(self, slug: str):
-        movie_instance = movie.Movie(slug)
-        reviews = movie.popular_reviews(movie_instance)
-        return reviews
-    
     def get_movie_tmdb_link(self, slug: str):
         movie_instance = movie.Movie(slug)
-        tmdb_link = movie_instance.tmdb_link()
+        tmdb_link = movie.movie_tmdb_link(movie_instance)
         return tmdb_link
 
     def get_movie_description(self, slug: str):
         movie_instance = movie.Movie(slug)
-        description = movie_instance.description()
+        description = movie.movie_description(movie_instance)
         return description
     
     def get_movie_poster(self, slug: str):
         movie_instance = movie.Movie(slug)
-        poster = movie_instance.poster()
+        poster = movie.movie_poster(movie_instance)
         return poster
 
 if __name__ == "__main__":
     client = LetterboxdClient()
-    client.get_user("thomas_welch")
-    client.get_movie("inception")
+    print(client.get_user("thomas_welch"))
+    print(client.get_movie("inception"))
     

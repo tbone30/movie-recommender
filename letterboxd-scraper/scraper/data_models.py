@@ -4,14 +4,17 @@ from datetime import datetime
 
 class UserProfile(BaseModel):
     username: str
-    display_name: Optional[str] = None
-    bio: Optional[str] = None
-    location: Optional[str] = None
-    website: Optional[str] = None
-    joined_date: Optional[str] = None
-    films_watched: Optional[int] = None
-    followers: Optional[int] = None
-    following: Optional[int] = None
+    watchlist_length: Optional[int] = None
+    favorites: Optional[List[str]] = None
+    stats: Optional[dict] = None
+
+class MovieProfile(BaseModel):
+    title: str
+    url: str
+    directors: List[str] = []
+    rating: str
+    year: int
+    genres: List[str] = []
 
 class FilmRating(BaseModel):
     film_title: str
