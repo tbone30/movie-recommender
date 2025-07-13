@@ -4,7 +4,7 @@ import { User } from '../types';
 export const userApi = {
   // Get all users
   getAllUsers: async (): Promise<User[]> => {
-    const response = await api.get('/users');
+    const response = await api.get('/users/getAll');
     return response.data;
   },
 
